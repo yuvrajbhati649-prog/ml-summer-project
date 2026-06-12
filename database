@@ -1,1 +1,23 @@
+# Database Details
+Database Name:
+CREATE DATABASE social_network;
+USE social_network;
+ CREATE TABLE social_network_ads (
+    ->     User_ID INT,
+    ->     Gender VARCHAR(10),
+    ->     Age INT,
+    ->     EstimatedSalary INT,
+    ->     Purchased INT
+    -> );
+ SHOW TABLES;
+SELECT COUNT(*) FROM social_network_ads;
 
+Table Name:
+social_network_ads
+
+Columns:
+User_ID
+Gender
+Age
+EstimatedSalary
+Purchased
