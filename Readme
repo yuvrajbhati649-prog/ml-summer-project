@@ -1,1 +1,203 @@
+SELECT COUNT(*) FROM social_network_ads;
+# Social Network Ads Purchase Prediction using Logistic Regression
+Project Description
 
+
+This project predicts whether a user will purchase a product based on Age and Estimated Salary. The dataset is stored in MySQL, fetched using Pandas, trained using Logistic Regression, and deployed using Flask API.
+
+# Technologies Used
+Python
+MySQL
+Pandas
+NumPy
+Scikit-Learn
+Flask
+Joblib
+Postman
+
+# Project Workflow
+CSV Dataset
+    ↓
+MySQL Database
+    ↓
+Pandas DataFrame
+    ↓
+Logistic Regression
+    ↓
+model.pkl
+    ↓
+Flask API
+    ↓
+Postman Testing
+
+# Database Details
+Database Name:
+CREATE DATABASE social_network;
+USE social_network;
+ CREATE TABLE social_network_ads (
+    ->     User_ID INT,
+    ->     Gender VARCHAR(10),
+    ->     Age INT,
+    ->     EstimatedSalary INT,
+    ->     Purchased INT
+    -> );
+ SHOW TABLES;
+SELECT COUNT(*) FROM social_network_ads;
+
+Table Name:
+social_network_ads
+
+Columns:
+User_ID
+Gender
+Age
+EstimatedSalary
+Purchased
+
+
+# Requirements.txt
+numpy
+pandas
+scikit.learn
+flask
+
+# model_traning.py
+import numpy as np
+import pandas as pd
+
+
+df=pd.read_csv("Social_Network_Ads.csv")
+print(df.head(2))
+df=df.drop(columns=["User ID","Gender"])
+x=df.drop(columns=["Purchased"])
+y=df["Purchased"]
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.2, random_state=42)
+from sklearn.ensemble import RandomForestClassifier
+rf= RandomForestClassifier()
+rf.fit(x_train,y_train)
+import joblib 
+#save the model
+joblib.dump(rf,"rf_model.pk1")
+print("Model saved as rf_model.pk1")
+
+
+# app.py
+from flask import Flask,request,jsonify
+import joblib
+import numpy as np
+from flask import Response
+app=Flask(__name__)
+#load the model once
+model=joblib.load("rf_model.pk1")
+@app.route('/predict',methods=['POST'])
+def predict() -> Response:
+    try:
+        data=request.get_json()
+        input_data=np.array(data['input']).reshape(1,-1)
+        prediction=model.predict(input_data)
+        return jsonify({'prediction':int(prediction[0])})
+    except Exception as o:
+        return jsonify({'error':str(0)})
+    
+if __name__=='__main__':
+    app.run(debug=True)
+    
+# pooja.py
+import pandas as pd
+
+df = pd.read_csv("Social_Network_Ads.csv")
+print(df.columns)
+print(df.head())
+
+# pooja1.py
+import pandas as pd
+import mysql.connector
+
+# CSV Read
+df =pd.read_csv("Social_Network_Ads.csv")
+
+# MySQL Connection
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="poojabhati123",   # apna password likho
+    database="social_network"
+)
+
+cursor = conn.cursor()
+
+for _, row in df.iterrows():
+    sql = """
+    INSERT INTO social_network_ads
+    (User_ID, Gender, Age, EstimatedSalary, Purchased)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+
+    values = (
+        int(row["User ID"]),
+        row["Gender"],
+        int(row["Age"]),
+        int(row["EstimatedSalary"]),
+        int(row["Purchased"])
+    )
+
+    cursor.execute(sql, values)
+
+conn.commit()
+
+print("Data inserted successfully!")
+
+cursor.close()
+conn.close()
+
+#Running the Project
+pip install pandas numpy scikit-learn flask mysql-connector-python joblib
+
+Train the model:
+python model_traning.py
+
+Run Flask:
+python app.py
+
+Server:
+http://127.0.0.1:5000
+
+
+#Postman Testing
+
+Method
+POST
+
+URL
+http://127.0.0.1:5000/predict
+
+Headers
+Content-Type : application/json
+
+Body (raw → JSON)
+{
+  "input": [19, 19000]
+}
+
+
+Response
+{
+  "prediction": 0
+}
+
+
+# Project Structure
+project/
+│
+├── Social_Network_Ads.csv
+├── upload_csv.py
+├── model_traning.py
+├── rf_model.pkl
+├── app.py
+├── requirements.txt
+└── README.md
+
+# Author
+yuvraj
+Machine Learning and Flask API Project using MySQL Database.
